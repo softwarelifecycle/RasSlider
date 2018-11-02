@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RasSlider", "RasSlider.csproj", "{97B22EE2-6AB8-4D24-BA98-170CBCD0D804}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdafruitClassLibrary", "\AdafruitClassLibrary-master\AdafruitClassLibrary\AdafruitClassLibrary.csproj", "{3F9D3776-590C-4881-8E27-E19571611E6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdafruitClassLibrary", "AdafruitClassLibrary-master\AdafruitClassLibrary\AdafruitClassLibrary.csproj", "{3F9D3776-590C-4881-8E27-E19571611E6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

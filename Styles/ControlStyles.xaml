@@ -72,7 +72,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CameraSliderStyle" TargetType="customControls:SliderRotateImage">
+    <Style x:Key="CameraSliderStyle" TargetType="Slider">
         <Setter Property="Background" Value="{ThemeResource SliderTrackFill}"/>
         <Setter Property="BorderThickness" Value="{ThemeResource SliderBorderThemeThickness}"/>
         <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFill}"/>

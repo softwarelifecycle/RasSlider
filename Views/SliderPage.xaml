@@ -28,10 +28,9 @@
                HorizontalAlignment="Center" 
                Margin="0,10,0,0"/>-->
 
-            <customControls:SliderRotateImage Grid.Row="1" Width="600"
-                    IsThumbToolTipEnabled="False"
+            <Slider Grid.Row="1" Width="600"
+                    IsThumbToolTipEnabled="False"  
                     Value="{Binding SliderPosition, Mode=TwoWay}"
-                    DegreesToRotate="{Binding DegreesToRotate}"
                     HorizontalAlignment="Center"
                     Margin="0,10,0,0"
                     Style="{StaticResource CameraSliderStyle}"/>

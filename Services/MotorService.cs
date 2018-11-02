@@ -19,13 +19,13 @@ namespace RasSlider.Services
             motorHat = new MotorHat();
             await motorHat.InitAsync(1600).ConfigureAwait(false);
             SliderStepper = motorHat.GetStepper(200, 1);
-            SliderStepper.SetSpeed(60); 
+            SliderStepper.SetSpeed(60);
         }
 
-        public void MoveSlider(ushort steps, ushort oldPos, ushort newPos)
+        public async void MoveSlider(ushort steps, ushort oldPos, ushort newPos)
         {
             MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
-            SliderStepper.step(steps, direction, MotorHat.Stepper.Style.SINGLE);
+            await Task.Run(() => SliderStepper.step(steps, direction, MotorHat.Stepper.Style.SINGLE));
         }
 
         public async Task PanCamera()
