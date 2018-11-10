@@ -74,9 +74,9 @@ namespace RasSlider.ViewModels
         }
 
 
-        private ushort sliderPosition;
+        private double sliderPosition;
 
-        public ushort SliderPosition
+        public double SliderPosition
         {
             get
             {
@@ -85,7 +85,7 @@ namespace RasSlider.ViewModels
 
             set
             {
-                motorService.MoveSlider(value, sliderPosition, value);
+                motorService.MoveSlider((ushort)value, (ushort)sliderPosition, (ushort)value);
                 SetProperty(ref sliderPosition, value);
                 Debug.WriteLine($"Position: {value}");
             }

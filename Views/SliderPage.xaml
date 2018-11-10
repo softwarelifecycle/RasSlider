@@ -5,8 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:vm="using:RasSlider.ViewModels"
-    xmlns:customControls="using:RasSlider.Controls" 
+    xmlns:customControls="using:RasSlider.Controls"
+    xmlns:b="using:RasSlider.Helpers"
     Style="{StaticResource PageStyle}"
     d:DesignHeight="480" d:DesignWidth="800"
     DataContext="{Binding SliderViewModel, Source={StaticResource Locator}}"
@@ -28,12 +30,14 @@
                HorizontalAlignment="Center" 
                Margin="0,10,0,0"/>-->
 
-            <Slider Grid.Row="1" Width="600"
+            <customControls:CameraSlider Grid.Row="1" Width="600"
                     IsThumbToolTipEnabled="False"  
-                    Value="{Binding SliderPosition, Mode=TwoWay}"
                     HorizontalAlignment="Center"
                     Margin="0,10,0,0"
-                    Style="{StaticResource CameraSliderStyle}"/>
+                    Value="{Binding SliderPosition}"
+                    Style="{StaticResource CameraSliderStyle}">
+                     
+            </customControls:CameraSlider>
 
             <Grid Grid.Row="2" x:Name="CenterControls">
                 <Grid.ColumnDefinitions>
