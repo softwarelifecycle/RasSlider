@@ -103,7 +103,7 @@
 
                 <Button  Margin="15,10,10,10" Content="Go Home" Command="{Binding GoHomeCommand}" Width="100" ToolTipService.ToolTip="Go Home" Style="{StaticResource circleButtonStyle}"/>
 
-                <Button  Margin="15,10,10,10" Content="Reset" Command="{Binding GoHomeCommand}"  Width="100" ToolTipService.ToolTip="Go Home" Style="{StaticResource circleButtonStyle}"/>
+                <Button  Margin="15,10,10,10" Content="Reset" Command="{Binding ResetCommand}"  Width="100" ToolTipService.ToolTip="Start Over" Style="{StaticResource circleButtonStyle}"/>
 
                 <Button  Margin="15,10,10,10"  Content="KeyFrame" Width="100" Command="{Binding KeyFrameCommand}" Style="{StaticResource circleButtonStyle}" />
 

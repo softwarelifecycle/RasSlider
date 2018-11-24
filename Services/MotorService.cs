@@ -33,20 +33,19 @@ namespace RasSlider.Services
             PanStepper = motorHat.GetStepper(200, 2);
         }
 
-        public async void MoveSlider(ushort steps, ushort oldPos, ushort newPos, uint speed = 60)
+        public async void MoveSlider(ushort steps, MotorHat.Stepper.Command direction, uint speed = 60)
         {
             SliderStepper.SetSpeed(speed);
-            MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
             await Task.Run(() => SliderStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE));
             ReleaseSliderMotor();
         }
 
-        public async void PanCamera(ushort steps, ushort oldPos, ushort newPos, uint speed = 60)
+        public async void PanCamera(ushort oldPos, ushort newPos, uint speed = 60)
         {
-            PanStepper.SetSpeed(speed);
-            MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
-            await Task.Run(() => PanStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE));
-            ReleasePanMotor();
+            //PanStepper.SetSpeed(speed);
+            //MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
+            //await Task.Run(() => PanStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE));
+            //ReleasePanMotor();
         }
 
         public async void ReleaseMotors()

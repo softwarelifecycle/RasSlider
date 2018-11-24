@@ -13,9 +13,16 @@ namespace RasSlider.ViewModels
         private MotorService motorService;
         private double priorDegreesToPan = 0;
         private double priorSliderPosition = 0;
+        private double homePosition;
 
 
         public RelayCommand SetHomeCommand
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand ResetCommand
         {
             get;
             private set;
@@ -128,25 +135,31 @@ namespace RasSlider.ViewModels
             KeyFrameCommand = new RelayCommand(KeyFrameExecute, true);
             PlayCommand = new RelayCommand(PlayExecute, true);
             ReleaseCommand = new RelayCommand(ReleaseExecute, true);
+            ResetCommand = new RelayCommand(ResetExecute, true);
 
             KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
 
             motorService = new MotorService();
         }
 
+        private void ResetExecute()
+        {
+            KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
+        }
+
         private void SetHomeExecute()
         {
-
+            priorSliderPosition = SliderPosition;
+            homePosition = SliderPosition;
         }
 
         private void GoHomeExecute()
         {
-
+            //motorService.MoveSlider((ushort)SliderPosition, (ushort)homePosition, Speed);
         }
 
         private void KeyFrameExecute()
         {
-            //MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
             KeyFramesViewModel kf = new KeyFramesViewModel()
             {
                 PriorDegreesToPan = priorDegreesToPan,
