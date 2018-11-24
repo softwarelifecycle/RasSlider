@@ -1,19 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AdafruitClassLibrary;
+using System.Threading;
 
 namespace RasSlider.ViewModels
 {
     public class KeyFramesViewModel : VMBase
     {
 
+        static int nextID;
+
+        public KeyFramesViewModel()
+        {
+            ID = Interlocked.Increment(ref nextID);
+        }
+
         public enum Speed
         {
             Slow,
             Medium,
             Fast
+        }
+
+        public double PriorDegreesToPan { get; set; }
+
+        public double PriorSliderPosition { get; set; }
+
+        private MotorHat.Stepper.Command direction;
+
+        public string DisplayDirection { get { return direction == MotorHat.Stepper.Command.FORWARD ? "Forward" : "BackWard"; } }
+
+        public MotorHat.Stepper.Command Direction
+        {
+            get
+            {
+                return direction;
+            }
+
+            set
+            {
+                SetProperty(ref direction, value);
+            }
         }
 
         private int id;
@@ -32,34 +57,34 @@ namespace RasSlider.ViewModels
         }
 
 
-        private int numberOfSteps;
+        private double sliderPosition;
 
-        public int NumberOfSteps
+        public double SliderPosition
         {
             get
             {
-                return numberOfSteps;
+                return sliderPosition;
             }
 
             set
             {
-                SetProperty(ref numberOfSteps, value);
+                SetProperty(ref sliderPosition, value);
             }
         }
 
 
-        private double numberOfDegrees;
+        private double degreesToPan;
 
-        public double NumberOfDegrees
+        public double DegreesToPan
         {
             get
             {
-                return numberOfDegrees;
+                return degreesToPan;
             }
 
             set
             {
-                SetProperty(ref numberOfDegrees, value);
+                SetProperty(ref degreesToPan, value);
             }
         }
 

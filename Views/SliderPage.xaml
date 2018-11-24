@@ -49,14 +49,16 @@
                      CanUserResizeColumns="True" AutoGenerateColumns="False"
                      Margin="5"
                      AlternatingRowBackground="LightGray"
+                     SelectedItem="{Binding SelectedKeyFrame, Mode=TwoWay}"
                      ItemsSource="{Binding KeyFrameCollection}"
                      HorizontalAlignment="Stretch">
                    
                     <controls:DataGrid.Columns>
-                        <controls:DataGridTextColumn Header="ID" Binding="{Binding Path=ID}" Tag="ID" />
-                        <controls:DataGridTextColumn Header="# Steps" Binding="{Binding NumberOfSteps}"/>
-                        <controls:DataGridTextColumn Header="# Degrees" Binding="{Binding NumberOfDegrees}"/>
-                        <controls:DataGridTextColumn Header="Pause Time" Binding="{Binding PauseTime}"/>
+                        <!--<controls:DataGridTextColumn Header="ID" Binding="{Binding Path=ID}" Tag="ID" />-->
+                        <controls:DataGridTextColumn Header="# Steps" Binding="{Binding SliderPosition}"/>
+                        <controls:DataGridTextColumn Header="# Degrees" Binding="{Binding DegreesToPan}"/>
+                        <controls:DataGridTextColumn Header="Pause(s)" Binding="{Binding PauseTime}"/>
+                        <controls:DataGridTextColumn Header="Direction" Binding="{Binding DisplayDirection}" />
                         <controls:DataGridTextColumn Header="Speed" Binding="{Binding Rate}"/>
                         <controls:DataGridTemplateColumn Header="Action">
                             <controls:DataGridTemplateColumn.CellTemplate>
@@ -75,7 +77,7 @@
                 <controls:RadialGauge   HorizontalAlignment="Right" Margin="0,0,5,0"
                   x:Name="CameraRotation"
                   Grid.Column="1"
-                  Value="{Binding DegreesToRotate, Mode=TwoWay}"
+                  Value="{Binding DegreesToPan, Mode=TwoWay}"
                   Minimum="0"
                   Maximum="240"
                   StepSize="10"
@@ -107,7 +109,7 @@
 
                 <Button  Margin="15,10,10,10" Content="Play" Width="100" Command="{Binding PlayCommand}" Style="{StaticResource circleButtonStyle}"  />
 
-                <Button  Margin="15,10,10,10" Content="Pause" Width="100" Command="{Binding PauseCommand}" Style="{StaticResource circleButtonStyle}" />
+                <Button  Margin="15,10,10,10" Content="Release" Width="100" Command="{Binding ReleaseCommand}" Style="{StaticResource circleButtonStyle}" />
             </StackPanel>
         </Grid>
     </Grid>

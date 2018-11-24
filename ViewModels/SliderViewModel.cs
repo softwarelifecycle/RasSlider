@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using GalaSoft.MvvmLight;
+﻿using AdafruitClassLibrary;
 using GalaSoft.MvvmLight.Command;
 using RasSlider.Services;
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace RasSlider.ViewModels
 {
@@ -11,6 +11,9 @@ namespace RasSlider.ViewModels
     public class SliderViewModel : VMBase
     {
         private MotorService motorService;
+        private double priorDegreesToPan = 0;
+        private double priorSliderPosition = 0;
+
 
         public RelayCommand SetHomeCommand
         {
@@ -36,27 +39,37 @@ namespace RasSlider.ViewModels
             private set;
         }
 
-        public RelayCommand PauseCommand
+        public RelayCommand ReleaseCommand
         {
             get;
             private set;
         }
 
-        private double degreesToRotate;
 
-        public double DegreesToRotate
+        private double degreesToPan = 0;
+
+        public double DegreesToPan
         {
             get
             {
-                return degreesToRotate;
+                return degreesToPan;
             }
 
             set
             {
-                SetProperty(ref degreesToRotate, value);
+                SetProperty(ref degreesToPan, value);
                 Debug.WriteLine($"Degrees: {value}");
             }
         }
+
+        private uint speed = 300;
+
+        public uint Speed
+        {
+            get { return speed; }
+            set { SetProperty(ref speed, value); }
+        }
+
 
         private ObservableCollection<KeyFramesViewModel> keyFrameCollection;
 
@@ -73,6 +86,22 @@ namespace RasSlider.ViewModels
             }
         }
 
+        private KeyFramesViewModel selectedKeyFrame;
+
+        public KeyFramesViewModel SelectedKeyFrame
+        {
+            get
+            {
+                return selectedKeyFrame;
+            }
+
+            set
+            {
+                SetProperty(ref selectedKeyFrame, value);
+            }
+        }
+
+
 
         private double sliderPosition;
 
@@ -85,9 +114,7 @@ namespace RasSlider.ViewModels
 
             set
             {
-                motorService.MoveSlider((ushort)value, (ushort)sliderPosition, (ushort)value);
                 SetProperty(ref sliderPosition, value);
-                Debug.WriteLine($"Position: {value}");
             }
 
         }
@@ -100,14 +127,11 @@ namespace RasSlider.ViewModels
             GoHomeCommand = new RelayCommand(GoHomeExecute, true);
             KeyFrameCommand = new RelayCommand(KeyFrameExecute, true);
             PlayCommand = new RelayCommand(PlayExecute, true);
-            PauseCommand = new RelayCommand(PauseExecute, true);
+            ReleaseCommand = new RelayCommand(ReleaseExecute, true);
 
             KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
 
             motorService = new MotorService();
-
-            KeyFramesViewModel kf = new KeyFramesViewModel() { ID = 1, NumberOfSteps = 200, NumberOfDegrees = 30, PauseTime = 1, Rate = KeyFramesViewModel.Speed.Medium };
-            KeyFrameCollection.Add(kf);
         }
 
         private void SetHomeExecute()
@@ -122,18 +146,38 @@ namespace RasSlider.ViewModels
 
         private void KeyFrameExecute()
         {
+            //MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
+            KeyFramesViewModel kf = new KeyFramesViewModel()
+            {
+                PriorDegreesToPan = priorDegreesToPan,
+                PriorSliderPosition = priorSliderPosition,
+                SliderPosition = Math.Abs(SliderPosition - priorSliderPosition),
+                DegreesToPan = Math.Abs(DegreesToPan - priorDegreesToPan),
+                Direction = SliderPosition > priorSliderPosition ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD,
+                PauseTime = 1,
+                Rate = KeyFramesViewModel.Speed.Medium
+            };
 
+            KeyFrameCollection.Add(kf);
+            priorSliderPosition = SliderPosition;
+            priorDegreesToPan = DegreesToPan;
         }
 
 
-        private  void PlayExecute()
+        private void PlayExecute()
         {
-           
+            // motorService.MoveSlider((ushort)Math.Abs(value - sliderPosition), (ushort)sliderPosition, (ushort)value, Speed);
+            // motorService.PanCamera((ushort)Math.Abs(value - sliderPosition), (ushort)sliderPosition, (ushort)value, Speed);
+
+
         }
 
-        private void PauseExecute()
+        /// <summary>
+        /// release motor current so they can spin and cool off!
+        /// </summary>
+        private void ReleaseExecute()
         {
-
+            motorService.ReleaseMotors();
         }
     }
 }
