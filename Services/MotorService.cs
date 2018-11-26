@@ -16,6 +16,7 @@ namespace RasSlider.Services
         private MotorHat motorHat;
 
         private readonly double distanceToStepsRatio = 20;
+        private readonly double degreesToStepsRation = 50;
 
 
         public MotorService()

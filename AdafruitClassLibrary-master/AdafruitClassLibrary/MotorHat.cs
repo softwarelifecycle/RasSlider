@@ -104,7 +104,7 @@ namespace AdafruitClassLibrary
 
         public class Stepper
         {
-            public enum Command { FORWARD, BACKWARD };
+            public enum Command { FORWARD=0, BACKWARD=1, NONE=2 };
 
             public enum Style { SINGLE, DOUBLE, INTERLEAVE, MICROSTEP };
 

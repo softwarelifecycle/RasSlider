@@ -2,7 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:customControls="using:RasSlider.Controls"
-    >
+    
+    xmlns:Custom="using:Microsoft.Toolkit.Uwp.UI.Controls">
+
 
     <Style x:Key="EllipseButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
@@ -72,7 +74,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CameraSliderStyle" TargetType="Slider">
+    <Style x:Key="CameraSliderStyle" TargetType="customControls:SliderRotateImage">
         <Setter Property="Background" Value="{ThemeResource SliderTrackFill}"/>
         <Setter Property="BorderThickness" Value="{ThemeResource SliderBorderThemeThickness}"/>
         <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFill}"/>
@@ -84,7 +86,7 @@
         <Setter Property="IsFocusEngagementEnabled" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="Slider">
+                <ControlTemplate TargetType="customControls:SliderRotateImage">
                     <Grid Margin="{TemplateBinding Padding}">
                         <Grid.Resources>
                             <Style x:Key="SliderThumbStyle" TargetType="Thumb">
@@ -93,11 +95,13 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Thumb">
-                                            <Border >
-                                                <Image Source="/Assets/CameraImage-Rotated.png" Height="80" Width="80" >
-                                                    <!--<Image.RenderTransform>
-                                                        <RotateTransform Angle="{TemplateBinding DegreesToRotate}"/>
-                                                    </Image.RenderTransform>-->
+                                            <Border>
+                                                <Image Source="/Assets/CameraImage-Rotated.png" Height="80" Width="80" RenderTransformOrigin="0.5,0.5" >
+                                                    <Image.RenderTransform>
+                                                        <TransformGroup>
+                                                            <RotateTransform Angle="{Binding ElementName=CameraRotation,Path=ValueAngle, Mode=TwoWay}" />
+                                                        </TransformGroup>
+                                                    </Image.RenderTransform>
                                                 </Image>
                                             </Border>
                                         </ControlTemplate>

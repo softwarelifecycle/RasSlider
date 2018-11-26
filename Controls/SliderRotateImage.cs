@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Xaml.Controls;
+﻿using System.Diagnostics;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace RasSlider.Controls
 {
@@ -15,7 +11,11 @@ namespace RasSlider.Controls
         public double DegreesToRotate
         {
             get { return (double)GetValue(DegreesToRotateProperty); }
-            set { SetValue(DegreesToRotateProperty, value); }
+            set
+            {
+                SetValue(DegreesToRotateProperty, value);
+                Debug.WriteLine($"Degrees: {value}");
+            }
         }
 
         // Using a DependencyProperty as the backing store for DegreesToRotate.  This enables animation, styling, binding, etc...

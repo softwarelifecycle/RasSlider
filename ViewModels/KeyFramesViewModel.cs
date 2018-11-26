@@ -24,22 +24,55 @@ namespace RasSlider.ViewModels
 
         public double PriorSliderPosition { get; set; }
 
-        private MotorHat.Stepper.Command direction;
+        private int? sliderDirection;
 
-        public string DisplayDirection { get { return direction == MotorHat.Stepper.Command.FORWARD ? "Forward" : "BackWard"; } }
+        public string DisplaySliderDirection => GetDisplayDirection(sliderDirection);
 
-        public MotorHat.Stepper.Command Direction
+        private string GetDisplayDirection(int? direction)
+        {
+            switch (direction)
+            {
+                case (int)MotorHat.Stepper.Command.FORWARD:
+                    return "Right";
+                case (int)MotorHat.Stepper.Command.BACKWARD:
+                    return "Left";
+                default:
+                    return "None";
+            }
+        }
+
+        public int? SliderDirection
         {
             get
             {
-                return direction;
+                return sliderDirection;
             }
 
             set
             {
-                SetProperty(ref direction, value);
+                SetProperty(ref sliderDirection, value);
             }
         }
+
+
+        private int? panDirection;
+
+        public int? PanDirection
+        {
+            get
+            {
+                return panDirection;
+            }
+
+            set
+            {
+                SetProperty(ref panDirection, value);
+            }
+        }
+
+
+        public string DisplayPanDirection => GetDisplayDirection(panDirection);
+
 
         private int id;
 

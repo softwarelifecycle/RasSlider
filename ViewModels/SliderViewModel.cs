@@ -4,6 +4,7 @@ using RasSlider.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Windows.UI.Popups;
 
 namespace RasSlider.ViewModels
 {
@@ -11,7 +12,8 @@ namespace RasSlider.ViewModels
     public class SliderViewModel : VMBase
     {
         private MotorService motorService;
-        private double priorDegreesToPan = 0;
+        private double panHomePosition = 120;
+        private double priorDegreesToPan = 120;
         private double priorSliderPosition = 0;
         private double homePosition;
 
@@ -28,7 +30,7 @@ namespace RasSlider.ViewModels
             private set;
         }
 
-        public RelayCommand GoHomeCommand
+        public RelayCommand OSPlayCommand
         {
             get;
             private set;
@@ -53,7 +55,7 @@ namespace RasSlider.ViewModels
         }
 
 
-        private double degreesToPan = 0;
+        private double degreesToPan = 120;
 
         public double DegreesToPan
         {
@@ -65,7 +67,7 @@ namespace RasSlider.ViewModels
             set
             {
                 SetProperty(ref degreesToPan, value);
-                Debug.WriteLine($"Degrees: {value}");
+                Debug.WriteLine(DegreesToPan - 120);
             }
         }
 
@@ -131,7 +133,7 @@ namespace RasSlider.ViewModels
         {
 
             SetHomeCommand = new RelayCommand(SetHomeExecute, true);
-            GoHomeCommand = new RelayCommand(GoHomeExecute, true);
+            OSPlayCommand = new RelayCommand(OSPlayExecute, true);
             KeyFrameCommand = new RelayCommand(KeyFrameExecute, true);
             PlayCommand = new RelayCommand(PlayExecute, true);
             ReleaseCommand = new RelayCommand(ReleaseExecute, true);
@@ -142,9 +144,25 @@ namespace RasSlider.ViewModels
             motorService = new MotorService();
         }
 
-        private void ResetExecute()
+        private async void ResetExecute()
         {
-            KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
+            MessageDialog msgbox = new MessageDialog("Are you sure?", "Resetting!");
+
+            msgbox.Commands.Clear();
+            msgbox.Commands.Add(new UICommand { Label = "Yes", Id = 0 });
+            msgbox.Commands.Add(new UICommand { Label = "No", Id = 1 });
+
+            var res = await msgbox.ShowAsync();
+            if ((int)res.Id == 0)
+            {
+                KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
+                priorDegreesToPan = 120;
+                priorSliderPosition = 0;
+                homePosition = 0;
+                SliderPosition = 0;
+                DegreesToPan = 120;
+            }
+
         }
 
         private void SetHomeExecute()
@@ -153,7 +171,7 @@ namespace RasSlider.ViewModels
             homePosition = SliderPosition;
         }
 
-        private void GoHomeExecute()
+        private void OSPlayExecute()
         {
             //motorService.MoveSlider((ushort)SliderPosition, (ushort)homePosition, Speed);
         }
@@ -166,8 +184,9 @@ namespace RasSlider.ViewModels
                 PriorSliderPosition = priorSliderPosition,
                 SliderPosition = Math.Abs(SliderPosition - priorSliderPosition),
                 DegreesToPan = Math.Abs(DegreesToPan - priorDegreesToPan),
-                Direction = SliderPosition > priorSliderPosition ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD,
-                PauseTime = 1,
+                SliderDirection = GetDirection(SliderPosition, priorSliderPosition),
+                PanDirection = GetDirection(DegreesToPan, priorDegreesToPan),
+                PauseTime = 0,
                 Rate = KeyFramesViewModel.Speed.Medium
             };
 
@@ -176,6 +195,28 @@ namespace RasSlider.ViewModels
             priorDegreesToPan = DegreesToPan;
         }
 
+        private int? GetDirection(double currentPos, double priorPos)
+        {
+            if (currentPos == priorPos)
+                return null;
+            else
+                return currentPos > priorPos ? (int)MotorHat.Stepper.Command.FORWARD : (int)MotorHat.Stepper.Command.BACKWARD;
+        }
+
+        private int GetPanDirection(double currentPos, double priorPos)
+        {
+            int direction = 0;
+            double deltaDeg = priorPos - currentPos;
+            if (deltaDeg < panHomePosition)
+            {
+                direction = (int)MotorHat.Stepper.Command.BACKWARD;
+            }
+            else
+            {
+                direction = (int)MotorHat.Stepper.Command.FORWARD;
+            }
+            return direction;
+        }
 
         private void PlayExecute()
         {
