@@ -73,12 +73,13 @@
                      HorizontalAlignment="Stretch">
 
                 <controls:DataGrid.Columns>
-                    <controls:DataGridTextColumn Header="Slider Position" Binding="{Binding SliderPosition}"/>
-                    <controls:DataGridTextColumn Header="Slider Direction" Binding="{Binding DisplaySliderDirection}" />
-                    <controls:DataGridTextColumn Header="Camera Rotation" Binding="{Binding DegreesToPan}"/>
-                    <controls:DataGridTextColumn Header="Rotation Direction" Binding="{Binding DisplayPanDirection}" />
+                    <controls:DataGridTextColumn Header="Position" Binding="{Binding SliderPosition}"/>
+                    <controls:DataGridTextColumn Header="Direction" Binding="{Binding DisplaySliderDirection}" />
+                    <controls:DataGridComboBoxColumn Header="Speed" Binding="{Binding SpeedID, Mode=TwoWay}" ItemsSource="{x:Bind ViewModel.SpeedList, Mode=OneWay}" DisplayMemberPath="SpeedDesc" />
+                    <controls:DataGridTextColumn Header="Pan Rotation" Binding="{Binding DegreesToPan}"/>
+                    <controls:DataGridTextColumn Header="Pan Direction" Binding="{Binding DisplayPanDirection}" />
+                    <controls:DataGridComboBoxColumn Header="Pan Speed" Binding="{Binding PanSpeedID, Mode=TwoWay}"  ItemsSource="{x:Bind ViewModel.SpeedList, Mode=OneWay}" DisplayMemberPath="SpeedDesc" />
                     <controls:DataGridTextColumn Header="Pause(s)" Binding="{Binding PauseTime}"/>
-                    <controls:DataGridTextColumn Header="Speed" Binding="{Binding Rate}"/>
                 </controls:DataGrid.Columns>
 
             </controls:DataGrid>

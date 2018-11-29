@@ -13,13 +13,6 @@ namespace RasSlider.ViewModels
             ID = Interlocked.Increment(ref nextID);
         }
 
-        public enum Speed
-        {
-            Slow,
-            Medium,
-            Fast
-        }
-
         public double PriorDegreesToPan { get; set; }
 
         public double PriorSliderPosition { get; set; }
@@ -33,9 +26,22 @@ namespace RasSlider.ViewModels
             switch (direction)
             {
                 case (int)MotorHat.Stepper.Command.FORWARD:
-                    return "Right";
-                case (int)MotorHat.Stepper.Command.BACKWARD:
                     return "Left";
+                case (int)MotorHat.Stepper.Command.BACKWARD:
+                    return "Right";
+                default:
+                    return "None";
+            }
+        }
+
+        private string GetPanDirection(int? direction)
+        {
+            switch (direction)
+            {
+                case (int)MotorHat.Stepper.Command.FORWARD:
+                    return "CCW";
+                case (int)MotorHat.Stepper.Command.BACKWARD:
+                    return "CW";
                 default:
                     return "None";
             }
@@ -71,7 +77,7 @@ namespace RasSlider.ViewModels
         }
 
 
-        public string DisplayPanDirection => GetDisplayDirection(panDirection);
+        public string DisplayPanDirection => GetPanDirection(panDirection);
 
 
         private int id;
@@ -139,18 +145,33 @@ namespace RasSlider.ViewModels
 
 
 
-        private Speed rate;
+        private int speedID;
 
-        public Speed Rate
+        public int SpeedID
         {
             get
             {
-                return rate;
+                return speedID;
             }
 
             set
             {
-                SetProperty(ref rate, value);
+                SetProperty(ref speedID, value);
+            }
+        }
+
+        private int panSpeedID;
+
+        public int PanSpeedID
+        {
+            get
+            {
+                return panSpeedID;
+            }
+
+            set
+            {
+                SetProperty(ref panSpeedID, value);
             }
         }
     }

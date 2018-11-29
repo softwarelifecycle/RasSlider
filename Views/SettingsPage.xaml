@@ -53,6 +53,13 @@
                         </RadioButton.CommandParameter>
                     </RadioButton>
                 </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Total Number of Steps of Slider:" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBox Text="{x:Bind ViewModel.TotalNumberOfSteps}" Width="100" Height="30" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+                    <Button Content="Start Counting" Width="120" Height="30" Margin="20,0,0,0" Command="{x:Bind ViewModel.CountTotalStepsCommand}"/>
+                    <Button Content="Stop Counting" Width="120" Height="30" Margin="20,0,0,0" Command="{x:Bind ViewModel.StopCountingCommand}"/>
+                </StackPanel>
             </StackPanel>
 
             <TextBlock

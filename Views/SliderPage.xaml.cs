@@ -1,6 +1,4 @@
-﻿using System;
-
-using RasSlider.ViewModels;
+﻿using RasSlider.ViewModels;
 
 using Windows.UI.Xaml.Controls;
 
@@ -8,7 +6,8 @@ namespace RasSlider.Views
 {
     public sealed partial class SliderPage : Page
     {
-        private SliderViewModel ViewModel
+
+        public SliderViewModel ViewModel
         {
             get { return DataContext as SliderViewModel; }
         }
@@ -16,6 +15,10 @@ namespace RasSlider.Views
         public SliderPage()
         {
             InitializeComponent();
+           
         }
     }
+
+
+
 }

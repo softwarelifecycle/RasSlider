@@ -2,8 +2,10 @@
 using GalaSoft.MvvmLight.Command;
 using RasSlider.Services;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using Windows.UI.Popups;
 
 namespace RasSlider.ViewModels
@@ -17,6 +19,38 @@ namespace RasSlider.ViewModels
         private double priorSliderPosition = 0;
         private double homePosition;
 
+        public List<Speeds> SpeedList = new List<Speeds>();
+
+        public SliderViewModel()
+        {
+            Init();
+        }
+
+        private void Init()
+        {
+            KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
+            motorService = new MotorService();
+
+            InitCommands();
+            InitSpeeds();
+        }
+
+        private void InitCommands()
+        {
+            SetHomeCommand = new RelayCommand(SetHomeExecute, true);
+            OSPlayCommand = new RelayCommand(OSPlayExecute, true);
+            KeyFrameCommand = new RelayCommand(KeyFrameExecute, true);
+            PlayCommand = new RelayCommand(PlayExecute, true);
+            ReleaseCommand = new RelayCommand(ReleaseExecute, true);
+            ResetCommand = new RelayCommand(ResetExecute, true);
+        }
+
+        private void InitSpeeds()
+        {
+            SpeedList.Add(new Speeds { SpeedID = 1, PanSpeedID = 1, SpeedValue = 5, SpeedDesc = "Slow" });
+            SpeedList.Add(new Speeds { SpeedID = 2, PanSpeedID = 2, SpeedValue = 200, SpeedDesc = "Normal" });
+            SpeedList.Add(new Speeds { SpeedID = 3, PanSpeedID = 3, SpeedValue = 300, SpeedDesc = "Fast" });
+        }
 
         public RelayCommand SetHomeCommand
         {
@@ -71,14 +105,6 @@ namespace RasSlider.ViewModels
             }
         }
 
-        private uint speed = 300;
-
-        public uint Speed
-        {
-            get { return speed; }
-            set { SetProperty(ref speed, value); }
-        }
-
 
         private ObservableCollection<KeyFramesViewModel> keyFrameCollection;
 
@@ -128,22 +154,6 @@ namespace RasSlider.ViewModels
 
         }
 
-
-        public SliderViewModel()
-        {
-
-            SetHomeCommand = new RelayCommand(SetHomeExecute, true);
-            OSPlayCommand = new RelayCommand(OSPlayExecute, true);
-            KeyFrameCommand = new RelayCommand(KeyFrameExecute, true);
-            PlayCommand = new RelayCommand(PlayExecute, true);
-            ReleaseCommand = new RelayCommand(ReleaseExecute, true);
-            ResetCommand = new RelayCommand(ResetExecute, true);
-
-            KeyFrameCollection = new ObservableCollection<KeyFramesViewModel>();
-
-            motorService = new MotorService();
-        }
-
         private async void ResetExecute()
         {
             MessageDialog msgbox = new MessageDialog("Are you sure?", "Resetting!");
@@ -187,7 +197,8 @@ namespace RasSlider.ViewModels
                 SliderDirection = GetDirection(SliderPosition, priorSliderPosition),
                 PanDirection = GetDirection(DegreesToPan, priorDegreesToPan),
                 PauseTime = 0,
-                Rate = KeyFramesViewModel.Speed.Medium
+                SpeedID = 3,
+                PanSpeedID = 2
             };
 
             KeyFrameCollection.Add(kf);
@@ -200,7 +211,7 @@ namespace RasSlider.ViewModels
             if (currentPos == priorPos)
                 return null;
             else
-                return currentPos > priorPos ? (int)MotorHat.Stepper.Command.FORWARD : (int)MotorHat.Stepper.Command.BACKWARD;
+                return currentPos > priorPos ? (int)MotorHat.Stepper.Command.BACKWARD : (int)MotorHat.Stepper.Command.FORWARD;
         }
 
         private int GetPanDirection(double currentPos, double priorPos)
@@ -220,7 +231,16 @@ namespace RasSlider.ViewModels
 
         private void PlayExecute()
         {
-            // motorService.MoveSlider((ushort)Math.Abs(value - sliderPosition), (ushort)sliderPosition, (ushort)value, Speed);
+            foreach (KeyFramesViewModel keyFrame in KeyFrameCollection)
+            {
+                MotorHat.Stepper.Command command;
+                if (Enum.TryParse(keyFrame.SliderDirection.ToString(), out command))
+                {
+                    motorService.MoveSlider((ushort)keyFrame.SliderPosition, command, (uint)SpeedList.FirstOrDefault(k => k.SpeedID == keyFrame.SpeedID).SpeedValue);
+                }
+            }
+            motorService.ReleaseSliderMotor();
+
             // motorService.PanCamera((ushort)Math.Abs(value - sliderPosition), (ushort)sliderPosition, (ushort)value, Speed);
 
 
@@ -233,5 +253,15 @@ namespace RasSlider.ViewModels
         {
             motorService.ReleaseMotors();
         }
+    }
+
+    public class Speeds
+    {
+        public int SpeedID { get; set; }
+
+        public int PanSpeedID { get; set; }
+
+        public int SpeedValue { get; set; }
+        public string SpeedDesc { get; set; }
     }
 }
