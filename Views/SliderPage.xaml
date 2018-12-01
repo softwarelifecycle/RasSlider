@@ -78,12 +78,11 @@
                     <controls:DataGridComboBoxColumn Header="Speed" Binding="{Binding SpeedID, Mode=TwoWay}" ItemsSource="{x:Bind ViewModel.SpeedList, Mode=OneWay}" DisplayMemberPath="SpeedDesc" />
                     <controls:DataGridTextColumn Header="Pan Rotation" Binding="{Binding DegreesToPan}"/>
                     <controls:DataGridTextColumn Header="Pan Direction" Binding="{Binding DisplayPanDirection}" />
-                    <controls:DataGridComboBoxColumn Header="Pan Speed" Binding="{Binding PanSpeedID, Mode=TwoWay}"  ItemsSource="{x:Bind ViewModel.SpeedList, Mode=OneWay}" DisplayMemberPath="SpeedDesc" />
+                    <controls:DataGridComboBoxColumn Header="Pan Speed" Binding="{Binding PanSpeedID, Mode=TwoWay}"  ItemsSource="{x:Bind ViewModel.PanSpeedList, Mode=OneWay}" DisplayMemberPath="SpeedDesc" />
                     <controls:DataGridTextColumn Header="Pause(s)" Binding="{Binding PauseTime}"/>
                 </controls:DataGrid.Columns>
 
             </controls:DataGrid>
-
 
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0" Height="50">
@@ -93,11 +92,9 @@
 
                 <Button  Margin="15,10,10,10" Content="Reset" Command="{Binding ResetCommand}"  Width="100" ToolTipService.ToolTip="Start Over" Style="{StaticResource circleButtonStyle}"/>
 
-                <Button  Margin="15,10,10,10"  Content="KeyFrame"  ToolTipService.ToolTip="Record Position Info"  Width="100" Command="{Binding KeyFrameCommand}" Style="{StaticResource circleButtonStyle}" />
+                <Button  Margin="15,10,10,10"  Content="Remember"  ToolTipService.ToolTip="Record Position Info"  Width="100" Command="{Binding KeyFrameCommand}" Style="{StaticResource circleButtonStyle}" />
 
-                <Button  Margin="15,10,10,10" Content="OS Play" Command="{Binding OSPlayCommand}" Width="100" ToolTipService.ToolTip="Play On-Screen" Style="{StaticResource circleButtonStyle}"/>
-
-                <Button  Margin="15,10,10,10" Content="Play" Width="100" Command="{Binding PlayCommand}" Style="{StaticResource circleButtonStyle}" ToolTipService.ToolTip="Play On Slider" />
+                <Button  Margin="15,10,10,10" Content="Play Back" Width="100" Command="{Binding PlayCommand}" Style="{StaticResource circleButtonStyle}" ToolTipService.ToolTip="Play On Slider" />
 
                 <Button  Margin="15,10,10,10" Content="Release" Width="100" Command="{Binding ReleaseCommand}" Style="{StaticResource circleButtonStyle}" ToolTipService.ToolTip="Release Motors"/>
             </StackPanel>

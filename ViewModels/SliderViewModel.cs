@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.UI.Popups;
 
 namespace RasSlider.ViewModels
@@ -20,6 +22,9 @@ namespace RasSlider.ViewModels
         private double homePosition;
 
         public List<Speeds> SpeedList = new List<Speeds>();
+        public List<PanSpeeds> PanSpeedList = new List<PanSpeeds>();
+
+        CancellationTokenSource cancelPlayBack = new CancellationTokenSource();
 
         public SliderViewModel()
         {
@@ -33,12 +38,12 @@ namespace RasSlider.ViewModels
 
             InitCommands();
             InitSpeeds();
+            InitPanSpeeds();
         }
 
         private void InitCommands()
         {
             SetHomeCommand = new RelayCommand(SetHomeExecute, true);
-            OSPlayCommand = new RelayCommand(OSPlayExecute, true);
             KeyFrameCommand = new RelayCommand(KeyFrameExecute, true);
             PlayCommand = new RelayCommand(PlayExecute, true);
             ReleaseCommand = new RelayCommand(ReleaseExecute, true);
@@ -47,9 +52,17 @@ namespace RasSlider.ViewModels
 
         private void InitSpeeds()
         {
-            SpeedList.Add(new Speeds { SpeedID = 1, PanSpeedID = 1, SpeedValue = 5, SpeedDesc = "Slow" });
-            SpeedList.Add(new Speeds { SpeedID = 2, PanSpeedID = 2, SpeedValue = 200, SpeedDesc = "Normal" });
-            SpeedList.Add(new Speeds { SpeedID = 3, PanSpeedID = 3, SpeedValue = 300, SpeedDesc = "Fast" });
+            SpeedList.Add(new Speeds { SpeedID = 1, SpeedValue = 5, SpeedDesc = "Slow" });
+            SpeedList.Add(new Speeds { SpeedID = 2, SpeedValue = 200, SpeedDesc = "Normal" });
+            SpeedList.Add(new Speeds { SpeedID = 3, SpeedValue = 300, SpeedDesc = "Fast" });
+        }
+
+        private void InitPanSpeeds()
+        {
+            PanSpeedList.Add(new PanSpeeds { PanSpeedID = 1, SpeedValue = 5, SpeedDesc = "Slow" });
+            PanSpeedList.Add(new PanSpeeds { PanSpeedID = 2, SpeedValue = 200, SpeedDesc = "Normal" });
+            PanSpeedList.Add(new PanSpeeds { PanSpeedID = 3, SpeedValue = 300, SpeedDesc = "Fast" });
+            PanSpeedList.Add(new PanSpeeds { PanSpeedID = 4, SpeedValue = 300, SpeedDesc = "Syncronize" });
         }
 
         public RelayCommand SetHomeCommand
@@ -64,11 +77,6 @@ namespace RasSlider.ViewModels
             private set;
         }
 
-        public RelayCommand OSPlayCommand
-        {
-            get;
-            private set;
-        }
 
         public RelayCommand KeyFrameCommand
         {
@@ -181,11 +189,6 @@ namespace RasSlider.ViewModels
             homePosition = SliderPosition;
         }
 
-        private void OSPlayExecute()
-        {
-            //motorService.MoveSlider((ushort)SliderPosition, (ushort)homePosition, Speed);
-        }
-
         private void KeyFrameExecute()
         {
             KeyFramesViewModel kf = new KeyFramesViewModel()
@@ -229,28 +232,59 @@ namespace RasSlider.ViewModels
             return direction;
         }
 
-        private void PlayExecute()
+        private async void PlayExecute()
         {
+
             foreach (KeyFramesViewModel keyFrame in KeyFrameCollection)
             {
-                MotorHat.Stepper.Command command;
-                if (Enum.TryParse(keyFrame.SliderDirection.ToString(), out command))
+                MotorHat.Stepper.Command panCommand;
+                MotorHat.Stepper.Command sliderCommand;
+                Task SliderTask = null;
+                Task PanTask = null;
+
+                List<Task> TaskList = new List<Task>();
+
+                if (keyFrame.SliderPosition > 0 && Enum.TryParse(keyFrame.SliderDirection.ToString(), out sliderCommand))
                 {
-                    motorService.MoveSlider((ushort)keyFrame.SliderPosition, command, (uint)SpeedList.FirstOrDefault(k => k.SpeedID == keyFrame.SpeedID).SpeedValue);
+                    SliderTask = Task.Factory.StartNew(() =>
+                       motorService.MoveSlider((ushort)keyFrame.SliderPosition, sliderCommand,
+                               cancelPlayBack.Token, MotorHat.Stepper.Style.DOUBLE,
+                               (uint)SpeedList.FirstOrDefault(k => k.SpeedID == keyFrame.SpeedID).SpeedValue)
+                   );
                 }
+                if (keyFrame.DegreesToPan > 0 && Enum.TryParse(keyFrame.PanDirection.ToString(), out panCommand))
+                {
+                    PanTask = Task.Factory.StartNew(() => motorService.PanCamera((ushort)keyFrame.DegreesToPan, panCommand,
+                        cancelPlayBack.Token, MotorHat.Stepper.Style.DOUBLE,
+                        (uint)PanSpeedList.FirstOrDefault(k => k.PanSpeedID == keyFrame.SpeedID).SpeedValue));
+                }
+
+                if (SliderTask != null)
+                    TaskList.Add(SliderTask);
+
+                if (PanTask != null)
+                    TaskList.Add(PanTask);
+
+                //wait till both finish... but return to caller, Keep responsive incase need to cancel!
+                await Task.WhenAll(TaskList);
+
+                // Pause if specified
+                if (keyFrame.PauseTime > 0)
+                {
+                    Thread.Sleep(keyFrame.PauseTime * 1000);
+                }
+
+                motorService.ReleaseSliderMotor();
             }
-            motorService.ReleaseSliderMotor();
-
-            // motorService.PanCamera((ushort)Math.Abs(value - sliderPosition), (ushort)sliderPosition, (ushort)value, Speed);
-
-
         }
+
 
         /// <summary>
         /// release motor current so they can spin and cool off!
         /// </summary>
         private void ReleaseExecute()
         {
+            //cancelPlayBack.Cancel();
             motorService.ReleaseMotors();
         }
     }
@@ -259,6 +293,12 @@ namespace RasSlider.ViewModels
     {
         public int SpeedID { get; set; }
 
+        public int SpeedValue { get; set; }
+        public string SpeedDesc { get; set; }
+    }
+
+    public class PanSpeeds
+    {
         public int PanSpeedID { get; set; }
 
         public int SpeedValue { get; set; }

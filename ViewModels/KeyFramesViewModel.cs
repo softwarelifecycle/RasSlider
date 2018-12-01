@@ -128,9 +128,9 @@ namespace RasSlider.ViewModels
         }
 
 
-        private double pauseTime;
+        private int pauseTime;
 
-        public double PauseTime
+        public int PauseTime
         {
             get
             {

@@ -1,8 +1,10 @@
 ﻿using AdafruitClassLibrary;
 using RasSlider.Helpers;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
+using static AdafruitClassLibrary.MotorHat.Stepper;
 
 namespace RasSlider.Services
 {
@@ -63,19 +65,28 @@ namespace RasSlider.Services
             PanStepper = motorHat.GetStepper(200, 2);
         }
 
-        public  void MoveSlider(ushort steps, MotorHat.Stepper.Command direction, uint speed = 60)
+        public void MoveSlider(ushort steps, MotorHat.Stepper.Command direction, CancellationToken ct, Style style = Style.INTERLEAVE, uint speed = 60)
         {
+            int retStep;
+
             SliderStepper.SetSpeed(speed);
-            //Task.Run(() => SliderStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE));
-            SliderStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE);
+            var totalSteps = Math.Abs(steps * distanceToStepsRatio);
+            SliderStepper.step((ushort)totalSteps, direction, MotorHat.Stepper.Style.DOUBLE);
+
+            //while (0 != (ushort)totalSteps--)
+            //{
+            //    ct.ThrowIfCancellationRequested();
+            //    retStep = SliderStepper.OneStep(direction, style);
+            //}
         }
 
-        public async void PanCamera(ushort oldPos, ushort newPos, uint speed = 60)
+        public async void PanCamera(ushort steps, MotorHat.Stepper.Command direction, CancellationToken ct, Style style = Style.INTERLEAVE, uint speed = 60)
         {
-            //PanStepper.SetSpeed(speed);
-            //MotorHat.Stepper.Command direction = newPos > oldPos ? MotorHat.Stepper.Command.FORWARD : MotorHat.Stepper.Command.BACKWARD;
-            //await Task.Run(() => PanStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE));
-            //ReleasePanMotor();
+            if (!ct.IsCancellationRequested)
+            {
+                PanStepper.SetSpeed(speed);
+                PanStepper.step((ushort)Math.Abs(steps * distanceToStepsRatio), direction, MotorHat.Stepper.Style.DOUBLE);
+            }
         }
 
         public async void ReleaseMotors()
